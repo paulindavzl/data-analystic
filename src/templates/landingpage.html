@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='css/landingpage.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Data Analystic</title>
+</head>
+<body>
+    <header>
+        <div>
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="logo">
+            <h2>Data Analystic</h2>
+        </div>
+       
+        <nav>
+            <a href="github.com/paulindavzl/data-analystic"><i class="fa fa-github"> GitHub</i></a>
+            <p>Começar</p>
+        </nav>
+    </header> <!--header-->
+
+    <main>
+        <section id="grafic-description">
+            <img src="{{ url_for('static', filename='img/grafic.svg') }}" alt="grafic">
+            <p class="description">Analise dados de planilhas e gere gráficos personalizáveis e interativos.</p>
+        </section>
+
+        <section id="script-description">
+            <img src="{{ url_for('static', filename='img/script.svg') }}" alt="script-image">
+            <p class="description">Utilize um script simples para automatizar tarefas repetitivas e gerar Dashboards de forma simples.</p>
+        </section>
+
+        <section id="start-now">
+            <p>Não perca tempo! Comece agora sua análise de dados.</p>
+            <button>Começar</button>
+        </section>
+    </main> <!--main-->
+
+    <footer>
+        <p class="footer">Projeto pessoal por <strong>Paulo Chaves</strong></p>
+        <p class="footer">Visite meu <a href="https://github.com/paulindavzl">GitHub</a></p>
+    </footer>
+</body>
+</html>
