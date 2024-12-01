@@ -15,31 +15,37 @@
         </div>
        
         <nav>
-            <a href="github.com/paulindavzl/data-analystic"><i class="fa fa-github"> GitHub</i></a>
-            <p>Começar</p>
+            <a class="start" href="home/">Começar</a>
+            <a class="github" href="https://github.com/paulindavzl/data-analystic"><i class="fa fa-github"> GitHub</i></a>
         </nav>
     </header> <!--header-->
 
+    <hr>
+
     <main>
-        <section id="grafic-description">
-            <img src="{{ url_for('static', filename='img/grafic.svg') }}" alt="grafic">
-            <p class="description">Analise dados de planilhas e gere gráficos personalizáveis e interativos.</p>
-        </section>
+        <section id="dashboard-description">
+            <img src="{{ url_for('static', filename='img/dashboard.png') }}" alt="dashboard">
+            <p>Analise dados de planilhas e gere gráficos<br>personalizáveis e interativos.</p>
+        </section> <!--section-->
+
+        <hr>
 
         <section id="script-description">
-            <img src="{{ url_for('static', filename='img/script.svg') }}" alt="script-image">
-            <p class="description">Utilize um script simples para automatizar tarefas repetitivas e gerar Dashboards de forma simples.</p>
-        </section>
+            <p>Utilize um script simples para automatizar tarefas repetitivas<br>e gerar Dashboards de forma simples.</p>
+            <img src="{{ url_for('static', filename='img/programming.png') }}" alt="script-image">
+        </section> <!--section-->
+
+        <hr>
 
         <section id="start-now">
             <p>Não perca tempo! Comece agora sua análise de dados.</p>
-            <button>Começar</button>
-        </section>
+            <button onclick="window.location='home'">Começar</button>
+        </section> <!--section-->
     </main> <!--main-->
 
     <footer>
         <p class="footer">Projeto pessoal por <strong>Paulo Chaves</strong></p>
-        <p class="footer">Visite meu <a href="https://github.com/paulindavzl">GitHub</a></p>
+        <p class="footer">Visite meu <a href="https://github.com/paulindavzl"><strong>GitHub</strong></a></p>
     </footer>
 </body>
 </html>
