@@ -1,5 +1,4 @@
 import time
-from typing import Optional as Op
 
 # executa scripts
 def execute(script: str):
@@ -8,9 +7,10 @@ def execute(script: str):
     with open('script.da', 'r') as file:
         script_line = 1
         transalated_script = '' # armazena um script python traduzido
+        condition = False # controla condições
 
         for line in file.readlines():
-            response = check_script(line)
+            response = check_script(line, condition)
             
             # verifica se houve erro
             if response.get('err'):
@@ -19,98 +19,124 @@ def execute(script: str):
             script_line += 1
 
             transalated_script += response.get('script')
-
-        # cria um arquivo .py
-        save(transalated_script, type='py')
+            condition = response.get('condition')
 
         # executa o arquivo .py
-        execute_py()
+        execute_py(transalated_script)
 
 
 # executa um arquivo python
-def execute_py():
-    import translated_script
+def execute_py(script):
+    print(script)
+    # exec(script)
 
 
 # salva o script para análise e execução
-def save(script: str, type: Op['str']='da'):
-    if type == 'da':
-        with open('./script.da', 'w') as file:
-            file.write(script)
-        
-        return 0
-    
-    with open('translated_script.py', 'w') as file:
+def save(script: str):
+    with open('./script.da', 'w') as file:
         file.write(script)
+        
 
 
 # verifica o script
-def check_script(script: str):
-    char = 1
+def check_script(script: str, condition: bool):
+    script = script.strip()
+    char = 1 # conta o número do caractére para identificar erros
     funct = [False, ''] # define se há uma função ativa
     special_chars = ['$', '=', '>', '<', '!']
     content = '' # conteúdo da função
     translate = '' # script tranduzido para Python
-    receive = False
+    receive = False # analisa se uma variável está recebendo algum valor
 
     for i in script:
-        # se o primeiro caractére não for $ e não for uma função (erro)
-        if char == 1 and not i == '$' and not funct[0] and funct[1] == '':
-            return {'err': 'invalid_sintaxe', 'char': char}
+        # se o script não iniciar com $ (erro)
+        if i != '$' and i != ' ' and char == 1 and not condition:
+            return {'err': 'invalid_sintaxe', 'char': char, 'verify': 0}
         
-        # se i for $ mas uma função já estiver ativa (erro)
+        # se tentar chamar uma função com um já ativa
         elif i == '$' and funct[0]:
-            return {'err': 'invalid_sintaxe', 'char': char}
+            return {'err': 'invalid_sintaxe', 'char': char, 'verify': 1}
         
-        # se o primeiro caractére do conteúdo de uma função for um número (erro)
-        elif not i in special_chars and not funct[0] and content == '' and i.isdigit():
-            return {'err': 'invalid_sintaxe', 'char': char}
+        # nomeclatura errada
+        elif not i.isupper() and funct[0] and i != ' ':
+            return {'err': 'invalid_sintaxe', 'char': char, 'verify': 2}
         
-        # se i $ inicia uma função
+        elif not funct[0] and content == '' and i.isdigit():
+            return {'err': 'invalid_sintaxe', 'char': char, 'verify': 3}
+        
+        # tenta iniciar uma função sem finalizar outra
+        elif i == '$' and funct[1] != '':
+            return {'err': 'invalid_sintaxe', 'char': char, 'verify': 4}
+        
+        # receber valor já estando recebendo um
+        elif i == '=' and receive:
+            return {'err': 'invalid_sintaxe', 'char': char, 'verify': 5}
+        
+        # inicia uma função
         elif i == '$':
             funct = [True, i]
-
-        # se i é ' ' e tem função ativa então adiciona conteúdo
+        
+        # adiciona conteúdo para um recebedor de dados
+        elif receive and i != ' ':
+            if i != ':':
+                content = content[: len(content) - 1]
+                content += i + '"'
+                continue
+            content += i
+        
+        # finalisa uma função
         elif i == ' ' and funct[0]:
             funct[0] = False
-        
-        # se uma função está ativa e i é válido (insere no conteúdo)
-        elif not i in special_chars and funct[0]:
+
+        # monta o nome da função
+        elif not receive and funct[0]:
             funct[1] += i
 
-        # verifica se está recebendo um valor
-        elif not i == ' ' and receive:
-            translate = translate[:len(translate)-1]
-            translate += i + '"'
-
-        # se i é ' ' e tem função ativa
+        # finaliza o conteúdo
         elif i == ' ' and content != '':
-            translate += parser(funct[1], content) + ' '
+            if not receive:
+                response = parser(funct[1], content)
+                translate += response[0]
+                condition = response[1]
+                content = ''
+                continue
+
+            response = parser(funct, content)
+            content += response[0]
+            condition = response[1]
+
+        # recebe dados
+        elif i == '=' and funct[1] != '':
             funct = [False, '']
-            content = ''
-        
-        # adiciona conteúdo
-        elif not funct[0] and funct[1] != '':
-            content += i
-
-        # verifica se i está indicando =
-        elif i == '=':
-            translate += '= ""'
             receive = True
-
+            content = ' == "' if condition else ' = "'
+        
+        # adiciona conteúdo da função
+        elif not funct[0] and funct[1] != '' and not receive:
+            content += i
+            
         char += 1
-    
-    return {'script': translate}
+
+    translate += content
+
+    return {'script': translate, 'condition': condition}
 
 
 # traduz comandos para script python
 def parser(funct: str, content: str):
-    print(funct, 0)
+    # declara uma variável
     if funct == '$VAR':
-        return content
+        return content, False
+    
+     # adiciona uma condição if
+    elif funct == '$IF':
+        return f'if {content}', True
+
     return content
+    
+   
 
+x = execute('''$IF variable = value:
+    condition''')
 
-
-
-x = execute('''$VAR variable = value''')
+print(x)
