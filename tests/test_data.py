@@ -155,4 +155,4 @@ def test_data_save_errors(create_test_data, data):
 
 
 if __name__ == '__main__':
-    pytest.main(['-vv', 'test_data.py'])
+    pytest.main(['-vv', 'tests/test_data.py'])
